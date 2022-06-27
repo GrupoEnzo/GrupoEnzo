@@ -1,0 +1,272 @@
+---
+title: "TyHM - Programacion en R 2022"
+author: 
+  - name: Santiago Luis Blazquez
+    email: santi98b@gmail.com
+    affiliation: Facultad de ingenieria de la Universidad Nacional de Cuyo
+    correspondingauthor: true
+  - name: Agostina Lencioni
+    email: agostinalencioni04@gmail.com 
+    affiliation: Facultad de ingenieria de la Universidad Nacional de Cuyo
+  - name: Enzo Viallet
+    email: enzo.viallet@enise.fr
+    affiliation: Facultad de ingenieria de la Universidad Nacional de Cuyo
+  - name: Agostina Sosa
+    email: agostina.sdo@gmail.com
+    affiliation: Facultad de ingenieria de la Universidad Nacional de Cuyo
+address:
+  - code: Facultad de ingenieria, Universidad Nacional de Cuyo
+    address: "Facultad de ingenieria Universidad Nacional de Cuyo"
+abstract: |
+  This is the abstract.
+
+  It consists of two paragraphs.
+keywords: 
+  - keyword1
+  - keyword2
+date: "`r Sys.Date()`"
+classoption: preprint, 3p, authoryear
+bibliography: mybibfile.bib
+linenumbers: false
+numbersections: true
+# Use a CSL with `citation_package = "default"`
+# csl: https://www.zotero.org/styles/elsevier-harvard
+output: 
+  rticles::elsevier_article:
+    keep_tex: true
+    citation_package: natbib
+---
+# Generar un vector secuencia
+
+## *for*
+```{r}
+
+C <- seq(1:200)
+for (i in 2:100) { 
+  C[i] <- (C[i-1]+3)
+  }
+head (C)
+
+
+```
+
+```{r}
+A <- vector()
+for(i in 0:40000){
+  A[i+1] <- (i*2)
+}
+tail(A)
+head(A)
+```
+## *seq*
+Con un paso de 4
+```{r}
+B <- vector()
+B<- seq(1,100000,4)
+tail(B)
+head(B)
+```
+
+## Performance
+
+Uso del algoritmo *Biblioteca tictoc*
+
+*" Esto de usar una biblioteca es llamar u cargar una procedimientos que generará comando nuevos en R. Como ya fue comentado, cargar una biblioteca implica ejecutar el comando install.packages() o usar en r-studio el menú de Herramientas y Luego Instalar paquetes. Las funciones tic y toc son de la misma biblioteca de Octave/Matlab y se usan de la misma manera para la evaluación comparativa que el tiempo de sistema recién demostrado. Sin embargo, tictoc agrega mucha más comodidad al usuario y armonía al
+conjunto"*
+
+```{r}
+library(tictoc)
+tic("inicio")
+# Tomo una muestra de 10 números ente 1 y 1000
+x<-sample(1:1000,900)
+# Creo una funcion para ordenar
+burbuja <- function(x){
+n<-length(x)
+for(j in 1:(n-1)){
+for(i in 1:(n-j)){
+if(x[i]>x[i+1]){
+temp<-x[i]
+x[i]<-x[i+1]
+x[i+1]<-temp
+}
+}
+}
+return(x)
+}
+res<-burbuja(x)
+res
+toc()
+```
+# Serie de Fibonacci
+```{r}
+K <- vector()
+K[1]<- 0
+K[2]<- 1
+for(var in 0:15)
+{
+K[var+3] <- K[var+2]+K[var+1]
+}
+head(K)
+```
+
+
+
+## Performance
+
+uso del algoritmo  *Biblioteca rbenchmark*.
+
+*"La documentación de la función benchmark del paquete rbenchmark R lo describe como “un simple contenedor alrededor de system.time”. Sin embargo, agrega mucha conveniencia en comparación con las llamadas simples a system.time. Por ejemplo, requiere solo una llamada de referencia para cronometrar múltiples repeticiones de múltiples expresiones. Además, los resultados devueltos se organizan convenientemente en un marco de datos"*
+
+```{r}
+library(rbenchmark)
+
+k <- vector()
+w <- vector()
+
+w = function(it){
+  k[1] <- 0
+  k[2] <- 1
+  for(i in 0:it){
+    k[i+3] <- (k[i+2]+k[i+1])
+  }
+  return(k)
+}
+
+
+it=197
+benchmark(w(it), replications = 1000)
+```
+
+-  *elapsed*: tiempo acumulado 
+-  *relative*: razon con la prueba mas rapida.
+-  *user.self*: CPU time spent by the current process
+-  *sys.self*: CPU time spent by the kernel (the operating system) on behalf of the current process.
+# Algoritmo para la pesadilla de Gauss
+```{r}
+for(i in 0:5)
+{ a<-i
+b <-i+1
+c <- a+b
+
+print(c)
+}
+```
+
+# Ordenacion de un vector por Metodo Burbuja
+
+A continuacion estan las lineas de codigo para ordenar, de mayor a menor, por metodo bubble un vector de 50 numeros elegidos aleatoriamente entre el 1 y el 1000:
+
+```{r}
+x <- sample(1:1000,50)
+
+head(x)
+tail(x)
+
+bubble = function(x){
+  n <- length(x)
+  for(i in 1:(n-1)){
+    for(j in 1:(n-i)){
+      if (x[j] < x[j+1]){
+        temporal <- x[j]
+        x[j] <- x[j+1]
+        x[j+1] <- temporal
+      }
+    }
+  }
+  return(x)
+}
+
+muestraordenada <- bubble(x)
+
+head(muestraordenada)
+tail(muestraordenada)
+```
+
+
+## Performance
+
+Uso del algoritmo *Biblioteca Microbenchmark*.
+
+*"Al igual que el punto de referencia del paquete rbenchmark, la función microbenchmark se puede usar para comparar tiempos de ejecución de múltiples fragmentos de código R. Pero ofrece una gran comodidad y funcionalidad adicional. Es más “beta” (inestable), pero como todo lo que hoy es nuevo poco a poco se hará más estable y no complicará tanto las cosas para el usuario final.Una cosa interesante es que se puede ver la salida gráfica del uso de recursos. Ver líneas finales del código. Me parece que una característica particularmente agradable de microbenchmark es la capacidad de verificar automáticamente los resultados de las expresiones de referencia con una función especificada por el usuario. Esto se demuestra a continuación, donde nuevamente comparamos tres métodos que computan el vector de coeficientes de un modelo lineal."*
+
+"A continuacion vemos las lineas de codigo para calcular el tiempo de ejecucion de el codigo para ordenar por metodo bubble. Tomaremos una muestra de 2000 numeros entre el 1 y el 1000000 .Lo compararemos con el comando *sort* de R:"
+"Utilizaremos como ejemplo x"
+```{r}
+library(microbenchmark)
+
+x <- sample(1:1000000,2000)
+
+bubble = function(x){
+  n <- length(x)
+  for(i in 1:(n-1)){
+    for(j in 1:(n-i)){
+      if (x[j] < x[j+1]){
+        temporal <- x[j]
+        x[j] <- x[j+1]
+        x[j+1] <- temporal
+      }
+    }
+  }
+  return(x)
+}
+
+
+microbenchmark(bubble(x),sort(x), times=5)
+
+library(ggplot2)
+autoplot(microbenchmark(bubble(x),sort(x), times=5))
+autoplot(microbenchmark(bubble(x),times=5))
+autoplot(microbenchmark(sort(x),times=5))
+```
+# Progresión geométrica del COVID-19
+## Modelado matemático de una epidema
+```{r}
+library(readr)
+casos_3_ <- read_delim("C:/Users/MI EQUIPO/Downloads/casos (3).csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(...2 = col_number()), 
+    trim_ws = TRUE, skip = 3)
+#Estadística de casos
+summary(casos_3_$`2`)
+  m <- length(casos_3_$`2`)
+ F <- (casos_3_$`2`)/(casos_3_$`2`)
+#Estadísticos de F
+mean(F,na.rm = TRUE)
+sd(F,na.rm = TRUE)
+var(F,na.rm = TRUE)
+#Grafico de casos
+plot(casos_3_$`2`,main="Contagios 2020", ylab="Casos positivos", xlab="Semanas")
+hist(as.numeric(casos_3_$`2`))
+plot(density(na.omit(casos_3_$`2`)))
+```
+
+## Accediendo a los datos actualizados del Covid-19---------------
+
+#determinacion en que fecha se contagiaran 40 millones de personas
+```{r}
+# Numeros de casos semanales en Argentina
+f1<-51778
+
+N<-0
+f3 <- 1.62
+f2 <- 0
+vec <- c(f1)
+
+while (f1 <= 40000000) {
+  f2 <- f1*f3
+  f1 <- f2
+  N <- N+1
+  vec <- c(vec,f2)
+  
+}
+
+N
+vec
+
+
+```
+
+
+Con el numero de casos actuales semanales en Argentina y con el factor de contagio F=1.62, tardariamos 14 semanas en llegar a los 44 millones de contagiados 
+
+
+```
